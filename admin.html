@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin - Menú</title>
+
+  <!-- NO cargar styles.css para no heredar estilos del menú público -->
+  <style>
+    :root{
+      --bg:#f6f6f6;
+      --card:#fff;
+      --border:rgba(0,0,0,.12);
+      --muted:rgba(0,0,0,.65);
+      --green:#1b5e20;
+      --dark:#263238;
+      --danger:#b71c1c;
+    }
+    *{ box-sizing:border-box; }
+    body{ margin:0; font-family: Arial, Helvetica, sans-serif; background:var(--bg); color:#111; }
+    .admin-wrap{ max-width:1200px; margin:0 auto; padding:16px; }
+    .card{ background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; margin:12px 0; }
+    .topbar{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+    h1,h2,h3{ margin:0 0 12px; }
+    .muted{ color:var(--muted); font-size:.92rem; }
+    .row{ display:grid; gap:12px; grid-template-columns:1fr 1fr; }
+    .row3{ display:grid; gap:12px; grid-template-columns:1fr 1fr 1fr; }
+    @media (max-width:1000px){ .row3{ grid-template-columns:1fr; } }
+    @media (max-width:900px){ .row{ grid-template-columns:1fr; } }
+    label{ display:block; font-size:.9rem; color:var(--muted); margin-bottom:6px; }
+    input, select, textarea{
+      width:100%;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid rgba(0,0,0,.2);
+      font-family:inherit;
+      font-size:14px;
+      background:#fff;
+    }
+    textarea{ min-height:88px; resize:vertical; }
+    button{
+      padding:10px 14px;
+      border-radius:10px;
+      border:0;
+      cursor:pointer;
+      font-weight:600;
+    }
+    .btn{ background:var(--green); color:#fff; }
+    .btn2{ background:var(--dark); color:#fff; }
+    .danger{ background:var(--danger); color:#fff; }
+    .actions{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .pill{
+      display:inline-block;
+      padding:3px 8px;
+      border-radius:999px;
+      border:1px solid rgba(0,0,0,.2);
+      font-size:.8rem;
+      color:#111;
+      background:#fff;
+    }
+    table{ width:100%; border-collapse:collapse; }
+    th, td{
+      border-bottom:1px solid rgba(0,0,0,.08);
+      padding:10px;
+      text-align:left;
+      vertical-align:top;
+      color:#111;
+    }
+    th{ color:#111; font-size:.95rem; }
+    .split{ display:grid; gap:14px; grid-template-columns:420px 1fr; }
+    @media (max-width:1100px){ .split{ grid-template-columns:1fr; } }
+    .hint{ font-size:.85rem; color:var(--muted); margin-top:6px; }
+    .ok{ color:var(--green); }
+    .err{ color:var(--danger); }
+
+    /* Modal */
+    #modal{
+      display:none;
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.55);
+      padding:16px;
+      z-index:9999;
+    }
+    .modal-card{
+      max-width:760px;
+      margin:40px auto;
+      background:#fff;
+      border-radius:14px;
+      padding:16px;
+      border:1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-wrap">
+    <div class="topbar">
+      <h1>Panel Admin</h1>
+      <div class="actions" id="topActions" style="display:none;">
+        <a class="btn2" href="/" style="text-decoration:none;display:inline-block;">Ver menú</a>
+        <button class="btn2" id="btnLogout" type="button">Salir</button>
+      </div>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="card" id="loginCard">
+      <h2>Ingresar</h2>
+      <div class="row">
+        <div>
+          <label>Email</label>
+          <input id="email" type="email" autocomplete="username" />
+        </div>
+        <div>
+          <label>Contraseña</label>
+          <input id="password" type="password" autocomplete="current-password" />
+        </div>
+      </div>
+      <div class="actions" style="margin-top:12px;">
+        <button class="btn" id="btnLogin" type="button">Login</button>
+      </div>
+      <div class="muted" id="loginMsg"></div>
+    </div>
+
+    <!-- APP -->
+    <div class="card" id="appCard" style="display:none;">
+      <div class="topbar">
+        <div class="muted" id="userInfo"></div>
+        <div class="muted" id="adminHint"></div>
+      </div>
+    </div>
+
+    <!-- CATEGORÍAS -->
+    <div class="card" id="catCard" style="display:none;">
+      <h2>Categorías</h2>
+
+      <div class="split">
+        <div class="card" style="margin:0;border-style:dashed;">
+          <h3>Nueva categoría</h3>
+
+          <div>
+            <label>Nombre</label>
+            <input id="catName" placeholder="Ej: Cafés" />
+          </div>
+
+          <div style="margin-top:10px;">
+            <label>Descripción</label>
+            <textarea id="catDesc" placeholder="Ej: Espresso, latte, capuccino..."></textarea>
+            <div class="hint">Opcional (sirve para el menú público).</div>
+          </div>
+
+          <div class="row" style="margin-top:10px;">
+            <div>
+              <label>Orden</label>
+              <input id="catOrder" type="number" value="0" />
+            </div>
+            <div>
+              <label>Estado</label>
+              <select id="catActive">
+                <option value="true" selected>Activa</option>
+                <option value="false">Inactiva</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="actions" style="margin-top:12px;">
+            <button class="btn" id="btnSaveCat" type="button">Guardar</button>
+          </div>
+
+          <div class="muted" id="catMsg"></div>
+        </div>
+
+        <div>
+          <h3>Listado</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Orden</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="catTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCTOS -->
+    <div class="card" id="prodCard" style="display:none;">
+      <h2>Productos</h2>
+
+      <div class="split">
+        <div class="card" style="margin:0;border-style:dashed;">
+          <h3>Nuevo producto</h3>
+
+          <div>
+            <label>Nombre</label>
+            <input id="prodName" placeholder="Ej: Latte" />
+          </div>
+
+          <div style="margin-top:10px;">
+            <label>Descripción</label>
+            <textarea id="prodDesc" placeholder="Ej: Espresso + leche vaporizada"></textarea>
+          </div>
+
+          <div class="row3" style="margin-top:10px;">
+            <div>
+              <label>Precio</label>
+              <input id="prodPrice" type="number" step="0.01" value="0" />
+            </div>
+            <div>
+              <label>Categoría</label>
+              <select id="prodCategory"></select>
+            </div>
+            <div>
+              <label>Orden</label>
+              <input id="prodOrder" type="number" value="0" />
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px;">
+            <div>
+              <label>Estado</label>
+              <select id="prodActive">
+                <option value="true" selected>Activo</option>
+                <option value="false">Inactivo</option>
+              </select>
+            </div>
+            <div class="hint" style="align-self:end;">
+              Tip: usá el orden para acomodar el menú.
+            </div>
+          </div>
+
+          <div class="actions" style="margin-top:12px;">
+            <button class="btn" id="btnSaveProd" type="button">Guardar</button>
+          </div>
+
+          <div class="muted" id="prodMsg"></div>
+        </div>
+
+        <div>
+          <div class="topbar">
+            <h3>Listado</h3>
+          </div>
+
+          <div class="row" style="margin-bottom:12px;">
+            <div>
+              <label>Buscar</label>
+              <input id="prodSearch" placeholder="Buscar por nombre o descripción..." />
+            </div>
+            <div>
+              <label>Filtrar por categoría</label>
+              <select id="prodFilterCategory">
+                <option value="">Todas</option>
+              </select>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Categoría</th>
+                <th>Precio</th>
+                <th>Orden</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="prodTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div id="modal">
+    <div class="modal-card">
+      <div class="topbar">
+        <h3 id="modalTitle" style="margin:0;">Editar</h3>
+        <button class="btn2" id="modalClose" type="button">Cerrar</button>
+      </div>
+
+      <div id="modalBody" style="margin-top:12px;"></div>
+
+      <div class="actions" style="margin-top:12px;">
+        <button class="btn" id="modalSave" type="button">Guardar cambios</button>
+      </div>
+
+      <div class="muted" id="modalMsg"></div>
+    </div>
+  </div>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>

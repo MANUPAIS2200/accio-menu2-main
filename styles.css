@@ -1,0 +1,504 @@
+/* =========================
+   BASE
+========================= */
+*{ box-sizing: border-box; }
+
+html, body{
+  margin: 0;
+  padding: 0;
+}
+
+body{
+  background: #222;
+  font-family: "Comfortaa", sans-serif;
+  color: #fff;
+}
+
+.main-content{
+  text-align: center;
+  margin: 2.5em auto;
+  max-width: 1000px;
+  padding: 0 1rem 3rem;
+}
+
+.page-title{
+  font-size: 1.2rem;
+  font-weight: 400;
+  margin-bottom: 1.5em;
+}
+
+.map-wrapper{
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.hint{
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+/* =========================
+   ADMIN LINK
+========================= */
+.admin-link{
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 9999;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.22);
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  backdrop-filter: blur(6px);
+}
+.admin-link:active{ transform: scale(0.98); }
+
+/* =========================
+   MAPA (RESPONSIVE)
+========================= */
+.map-base{
+  width: min(92vw, 360px);
+  aspect-ratio: 306 / 600;
+  height: auto;
+  background: url("https://meowlivia.s3.us-east-2.amazonaws.com/codepen/map/9.png") center center / cover;
+  position: relative;
+  display: inline-block;
+  transform-origin: top center;
+  cursor: pointer;
+}
+
+@media (min-width: 1100px){
+  .map-base{ transform: scale(1.1); }
+}
+
+/* Oscurecer un poquito el mapa detrás cuando abre */
+.map-base::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent, rgba(0,0,0,0.15));
+  opacity: 0;
+  transition: opacity 0.45s ease 0.2s;
+  z-index: 15;
+}
+.map-base.active::after{ opacity: 1; }
+
+/* =========================
+   PANEL DEL MENÚ
+========================= */
+.menu-panel{
+  position: absolute;
+  top: 8%;
+  bottom: 8%;
+  left: 4%;
+  right: 4%;
+  background: rgba(248, 233, 200, 0.86);
+  border-radius: 14px;
+  border: 1px solid rgba(80, 52, 26, 0.4);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+  padding: 0.8rem 1rem;
+  overflow-y: auto;
+  color: #3b2414;
+  backdrop-filter: blur(2px);
+
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.96);
+  transition: opacity 0.45s ease 0.3s, transform 0.45s ease 0.3s;
+  z-index: 20;
+}
+
+.map-base.active .menu-panel{
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+}
+
+/* Scroll mejor en móvil */
+.menu-panel{
+  -webkit-overflow-scrolling: touch;
+}
+
+/* GRID DEL MENÚ: 4/2/1 columnas */
+.menu-panel-inner{
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.1rem;
+}
+
+@media (max-width: 980px){
+  .menu-panel-inner{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px){
+  .menu-panel-inner{ grid-template-columns: 1fr; }
+}
+
+/* =========================
+   ESTILO DEL MENÚ (SECCIONES/ITEMS)
+========================= */
+.muted-loading{
+  color: #3b2414;
+  font-size: 0.9rem;
+  opacity: .9;
+}
+
+.menu-column h2{
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid rgba(80, 52, 26, 0.55);
+  margin: 0 0 0.35rem;
+  padding-bottom: 0.18rem;
+}
+
+.cat-desc{
+  font-size: 0.72rem;
+  opacity: .85;
+  margin: 0 0 .35rem;
+}
+
+.menu-subtitle{
+  font-size: 0.8rem;
+  margin: 0.55rem 0 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.menu-list{
+  list-style: none;
+  margin: 0.25rem 0 0.75rem;
+  padding: 0;
+}
+
+.menu-list li{
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  font-size: 0.78rem;
+  margin: 0.10rem 0;
+}
+
+.item-left{
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 72%;
+}
+
+.item-name{
+  font-weight: 600;
+}
+
+.item-desc{
+  font-size: 0.70rem;
+  opacity: 0.85;
+  margin-top: 2px;
+}
+
+.dots{
+  flex: 1 1 auto;
+  border-bottom: 1px dotted rgba(80, 52, 26, 0.55);
+  margin: 0 0.25rem;
+  transform: translateY(-2px);
+}
+
+.price{
+  flex: 0 0 auto;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.menu-note{
+  margin-top: 0.6rem;
+  font-size: 0.72rem;
+}
+
+/* =========================
+   ELEMENTOS DEL MAPA (FLAPS, LADOS, HUELLAS)
+   Adaptados a tamaños fluidos
+========================= */
+.map-flap{
+  transform-style: preserve-3d;
+  position: absolute;
+  width: 100%;
+  height: 25%;
+  margin: auto;
+  left: 0;
+  right: 0;
+  transition: 0.5s ease;
+  top: 25%;
+}
+
+.map-flap__front,
+.map-flap__back{
+  backface-visibility: hidden;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+
+.map-flap__back{
+  transform: scale(-1) rotateY(180deg);
+}
+
+.flap--1{
+  box-shadow: 0 -1px 6px rgba(97, 83, 73, 0.5);
+}
+.flap--1 .map-flap__front{
+  background: url("https://meowlivia.s3.us-east-2.amazonaws.com/codepen/map/mini-1.png") center left / cover;
+}
+.flap--1 .map-flap__back{
+  background: url("https://meowlivia.s3.us-east-2.amazonaws.com/codepen/map/mini-3.png") -3px 0/ cover;
+}
+
+.flap--2{
+  box-shadow: 0 1px 6px rgba(97, 83, 73, 0.5);
+  top: 50%;
+}
+.flap--2 .map-flap__front{
+  background: url("https://meowlivia.s3.us-east-2.amazonaws.com/codepen/map/mini-2.png") center left / cover;
+}
+.flap--2 .map-flap__back{
+  background: url("https://meowlivia.s3.us-east-2.amazonaws.com/codepen/map/mini-4.png") -3px 0/ cover;
+}
+
+/* Lados: dependen del contenedor (no fijos) */
+.map-side{
+  height: 100%;
+  width: 50%;
+  position: absolute;
+  transform-style: preserve-3d;
+  transition: 0.3s ease;
+  top: 0;
+}
+
+.map-side .front,
+.map-side .back{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background-repeat: no-repeat;
+  background-position: left top;
+  background-size: cover;
+  background-image: var(--image);
+  backface-visibility: hidden;
+}
+
+.map-side .back{
+  background-image: url("https://meowlivia.s3.us-east-2.amazonaws.com/codepen/map/back.png");
+}
+
+.side-1{ left: 0; margin-left: 1.5px; }
+.side-2{ left: 50%; margin-left: -2px; }
+.side-3{ left: 0; margin-left: 3px; }
+.side-4{ left: 50%; margin-left: -1px; }
+.side-5{ left: 0; }
+.side-6{ left: 50%; }
+
+.side-3 .back,
+.side-4 .back{ transform: rotateY(180deg); }
+
+.side-5 .back{
+  background-image: url("https://meowlivia.s3.us-east-2.amazonaws.com/codepen/map/1.png");
+}
+
+.side-6 .front{ background-size: 99.5%; }
+.side-6 .back{
+  background-image: url("https://meowlivia.s3.us-east-2.amazonaws.com/codepen/map/17.png");
+}
+
+/* Scroll con nombre */
+.scroll-name{
+  position: absolute;
+  bottom: 105px;
+  left: -60px;
+  width: 150px;
+  height: 30px;
+  font: 15px "Satisfy", cursive;
+  text-align: center;
+  background: url("https://meowlivia.s3.us-east-2.amazonaws.com/codepen/map/scroll.svg") center center / cover;
+  z-index: 10;
+  color: #615349;
+  cursor: default;
+  opacity: 0;
+}
+
+/* Huellitas */
+.footstep{
+  position: absolute;
+  background: #615349;
+  width: 6px;
+  height: 12px;
+  border-radius: 80% 80% 70% 70% / 130% 130% 25% 25%;
+  z-index: 10;
+  opacity: 0;
+}
+.footstep::before{
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  top: 110%;
+  left: 0;
+  background: #615349;
+  border-radius: 0 0 100% 100%;
+}
+.footstep.left{ transform: rotate(5deg); }
+.footstep.right{ transform: rotate(-3deg) translateY(15px) translateX(10px); }
+
+.footsteps-1 .footstep.left{ bottom: 150px; left: 18px; transform: rotate(35deg); }
+.footsteps-1 .footstep.right{ bottom: 150px; left: 28px; transform: rotate(30deg); }
+
+.footsteps-2 .footstep.left{ bottom: 285px; left: 280px; transform: rotate(-90deg); }
+.footsteps-2 .footstep.right{ bottom: 275px; left: 285px; transform: rotate(-85deg); }
+
+.footsteps-2 .scroll-name{ bottom: 300px; left: 220px; }
+
+/* =========================
+   MAPA ABIERTO (ANIMACIONES)
+========================= */
+.map-base.active .flap--1{
+  transform: rotateX(180deg);
+  transform-origin: top center;
+  transition: 0.6s transform 1.5s;
+}
+
+.map-base.active .flap--2{
+  transform: rotateX(180deg);
+  transform-origin: bottom center;
+  transition: 0.6s transform 1.8s;
+}
+
+.map-base.active .side-1{
+  transform-origin: center left;
+  transform: rotateY(180deg) skewY(2deg);
+  transition: 0.5s all ease-in-out 0.6s;
+}
+.map-base.active .side-1 .front{ transform: rotateY(180deg); }
+
+.map-base.active .side-2{
+  transform: rotateY(180deg) skewY(-2deg);
+  transform-origin: center right;
+  transition: 0.5s all ease-in-out 0.6s;
+}
+.map-base.active .side-2 .front{ transform: rotateY(180deg); }
+
+.map-base.active .side-3{
+  left: -50%;
+  transform: skewY(2deg) translateX(-100%);
+  top: 8px;
+  transition: 0.5s transform ease 0.8s, 0.3s left ease 0.8s, 0.5s top ease 0.8s;
+}
+
+.map-base.active .side-4{
+  left: 100%;
+  transform: skewY(-2deg) translateX(100%);
+  top: 8px;
+  margin-left: -7px;
+  transition: 0.5s transform ease 0.8s, 0.3s left ease 0.8s, 0.5s top ease 0.8s, 0.5s margin 0.8s;
+}
+
+.map-base.active .side-5{
+  left: -100%;
+  transform-origin: center left;
+  transform: rotateY(180deg);
+  transition: 0.5s transform, 0.7s left 0.8s, 0.2s margin 0.8s;
+  top: 0;
+  margin-left: 4px;
+}
+.map-base.active .side-5 .front{
+  transform: rotateY(180deg);
+  transition: 0.1s transform;
+}
+
+.map-base.active .side-6{
+  left: 150%;
+  transform: rotateY(180deg);
+  transform-origin: center right;
+  margin-left: -8px;
+  transition: 0.5s transform 0.3s, 0.7s left 0.8s, 0.5s top 0.8s, 0.5s margin 0.8s;
+}
+.map-base.active .side-6 .front{
+  transform: rotateY(180deg);
+  transition: 0.1s transform;
+}
+
+.map-base.active .footstep,
+.map-base.active .scroll-name{
+  opacity: 1;
+  transition: 0.5s opacity 2.5s;
+}
+
+/* =========================
+   EXPANDIR MAPA AL ABRIR (FULL)
+   (mantiene el look y evita tamaño fijo)
+========================= */
+.map-base.active{
+  width: min(100vw, 1000px) !important;
+  aspect-ratio: 1000 / 600;
+  height: auto;
+  transform: none !important;
+}
+
+/* PANEL A TODO ANCHO AL ABRIR */
+.map-base.active .menu-panel{
+  left: 0 !important;
+  right: 0 !important;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1.2rem;
+  border-radius: 12px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+@media (max-width: 700px){
+  body{ background: #141414; }
+
+  .main-content{
+    margin: 0;
+    padding: 0;
+    max-width: 100%;
+  }
+
+  .page-title,
+  .hint{ display: none; }
+
+  .map-wrapper{
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* en mobile lo hacemos grande pero controlado */
+  .map-base{
+    width: min(96vw, 420px);
+    transform: none;
+  }
+
+  .menu-panel{
+    top: 4%;
+    bottom: 4%;
+    left: 0;
+    right: 0;
+    border-radius: 0;
+    padding: 0.7rem 0.6rem;
+  }
+
+  /* cuando está abierto en mobile: ocupa el ancho */
+  .map-base.active{
+    width: 100vw !important;
+  }
+
+  .map-base.active .menu-panel{
+    padding: 0.8rem;
+    border-radius: 0;
+  }
+}
