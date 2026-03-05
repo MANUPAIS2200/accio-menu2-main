@@ -583,3 +583,39 @@ body{
   .map-base.active .menu-list li{ font-size: 0.66rem; }
   .map-base.active .menu-note{ font-size: 0.66rem; }
 }
+
+/* =========================
+   MOBILE: permitir scroll horizontal del MAPA al abrir
+   (swipe para mover el mapa a izquierda/derecha)
+========================= */
+@media (max-width: 700px){
+
+  /* por defecto, sin scroll horizontal */
+  .map-wrapper{
+    overflow: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* cuando el mapa está abierto, el wrapper se vuelve "scroller" */
+  .map-wrapper:has(.map-base.active){
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    /* “snap” suave para que vuelva al centro fácil */
+    scroll-snap-type: x mandatory;
+
+    /* un poco de padding para que el centro no quede pegado */
+    padding: 0 6vw;
+  }
+
+  /* el mapa abierto participa del snap */
+  .map-wrapper:has(.map-base.active) .map-base.active{
+    scroll-snap-align: center;
+  }
+
+  /* importante: el body no debe scrollear horizontal,
+     el que scrollea es el wrapper */
+  html, body{
+    overflow-x: hidden;
+  }
+}
