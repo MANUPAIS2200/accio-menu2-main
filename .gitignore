@@ -1,0 +1,19 @@
+# dependencies
+node_modules/
+
+# vite
+dist/
+.vite/
+**/.vite/
+
+# caches
+node_modules/.cache/
+.cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# env
+.env
+.env.*
