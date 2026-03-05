@@ -517,3 +517,69 @@ body{
     gap: 12px;
   }
 }
+
+/* =========================
+   MOBILE: mapa abierto como libro (horizontal)
+   - el mapa se vuelve más ancho que la pantalla
+   - se centra (se ven lados a izquierda y derecha)
+   - el menú queda centrado en el medio
+========================= */
+@media (max-width: 700px){
+
+  /* que no aparezca scroll horizontal de la página */
+  html, body{
+    overflow-x: hidden;
+  }
+
+  /* el wrapper recorta los extremos del mapa */
+  .map-wrapper{
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* mapa cerrado (vertical) */
+  .map-base{
+    width: min(92vw, 420px);
+    aspect-ratio: 306 / 600;
+    height: auto;
+    transform: none;
+  }
+
+  /* mapa abierto: horizontal, “más ancho que el celu” */
+  .map-base.active{
+    width: 260vw !important;            /* <-- probá 240vw / 260vw / 280vw */
+    max-width: none !important;
+    aspect-ratio: 1000 / 600;
+    height: min(92vh, calc(260vw * 0.6)); /* 0.6 = 600/1000 */
+    transform: none !important;
+  }
+
+  /* el panel del menú centrado en el medio del mapa */
+  .map-base.active .menu-panel{
+    top: 6%;
+    bottom: 6%;
+
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%);
+
+    width: min(92vw, 720px);           /* tamaño del “papel” central */
+    max-width: 92vw;
+
+    border-radius: 14px;
+    padding: 0.9rem 0.85rem;
+  }
+
+  /* mantener 4 columnas (ojo: en celu queda chico, pero cumple tu requisito) */
+  .map-base.active .menu-panel-inner{
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+
+  /* tipografías un toque más chicas para que entren */
+  .map-base.active .menu-column h2{ font-size: 0.72rem; }
+  .map-base.active .menu-list li{ font-size: 0.66rem; }
+  .map-base.active .menu-note{ font-size: 0.66rem; }
+}
