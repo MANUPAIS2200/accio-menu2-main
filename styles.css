@@ -47,7 +47,7 @@ body{
   position: fixed;
   top: 12px;
   right: 12px;
-  z-index: 9999;
+  z-index: 10050;
   background: rgba(255,255,255,0.12);
   border: 1px solid rgba(255,255,255,0.22);
   color: #fff;
@@ -60,7 +60,7 @@ body{
 .admin-link:active{ transform: scale(0.98); }
 
 /* =========================
-   MAPA (RESPONSIVE)
+   MAPA (CERRADO / RESPONSIVE)
 ========================= */
 .map-base{
   width: min(92vw, 360px);
@@ -71,6 +71,9 @@ body{
   display: inline-block;
   transform-origin: top center;
   cursor: pointer;
+
+  /* para que el click no se "pierda" */
+  -webkit-tap-highlight-color: transparent;
 }
 
 @media (min-width: 1100px){
@@ -90,7 +93,24 @@ body{
 .map-base.active::after{ opacity: 1; }
 
 /* =========================
-   PANEL DEL MENÚ
+   ESTADO ABIERTO: mapa se centra y gana ancho (tipo libro)
+   - NO lo hago fixed para no romper tus animaciones originales.
+   - Se expande al ancho del viewport, con un máximo “lindo”.
+========================= */
+.map-base.active{
+  width: min(100vw, 1200px) !important;
+  aspect-ratio: 1000 / 600;   /* mantiene la proporción de “mapa abierto” */
+  height: auto;
+  transform: none !important;
+}
+
+/* cuando está abierto, el wrapper lo centra */
+.map-wrapper{
+  align-items: flex-start;
+}
+
+/* =========================
+   PANEL DEL MENÚ (CENTRADO)
 ========================= */
 .menu-panel{
   position: absolute;
@@ -103,7 +123,7 @@ body{
   border: 1px solid rgba(80, 52, 26, 0.4);
   box-shadow: 0 6px 16px rgba(0,0,0,0.4);
   padding: 0.8rem 1rem;
-  overflow-y: auto;
+  overflow: hidden; /* el scroll lo maneja el inner */
   color: #3b2414;
   backdrop-filter: blur(2px);
 
@@ -118,25 +138,36 @@ body{
   opacity: 1;
   pointer-events: auto;
   transform: scale(1);
+
+  /* menú centrado como “hoja” */
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) scale(1);
+  width: min(100%, 1000px);
+  max-width: 1000px;
+  padding: 1.1rem 1.1rem;
 }
 
-/* Scroll mejor en móvil */
-.menu-panel{
-  -webkit-overflow-scrolling: touch;
-}
-
-/* GRID DEL MENÚ: 4/2/1 columnas */
+/* Scroll suave mobile */
 .menu-panel-inner{
+  height: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+
+  /* 👇 4 columnas SIEMPRE */
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(220px, 1fr));
   gap: 1.1rem;
+
+  /* Si la pantalla es chica, aparece scroll horizontal para mantener 4 col */
+  min-width: 920px;              /* 4 * 220 + gaps (aprox) */
+  padding-bottom: 12px;
 }
 
-@media (max-width: 980px){
-  .menu-panel-inner{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (max-width: 600px){
-  .menu-panel-inner{ grid-template-columns: 1fr; }
+/* Para que el panel permita scroll horizontal cuando haga falta */
+.map-base.active .menu-panel{
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 /* =========================
@@ -144,7 +175,7 @@ body{
 ========================= */
 .muted-loading{
   color: #3b2414;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   opacity: .9;
 }
 
@@ -267,7 +298,7 @@ body{
   background: url("https://meowlivia.s3.us-east-2.amazonaws.com/codepen/map/mini-4.png") -3px 0/ cover;
 }
 
-/* Lados: dependen del contenedor (no fijos) */
+/* Lados */
 .map-side{
   height: 100%;
   width: 50%;
@@ -361,6 +392,7 @@ body{
 
 /* =========================
    MAPA ABIERTO (ANIMACIONES)
+   => esto es lo que hace “abrir como libro”
 ========================= */
 .map-base.active .flap--1{
   transform: rotateX(180deg);
@@ -435,29 +467,9 @@ body{
 }
 
 /* =========================
-   EXPANDIR MAPA AL ABRIR (FULL)
-   (mantiene el look y evita tamaño fijo)
-========================= */
-.map-base.active{
-  width: min(100vw, 1000px) !important;
-  aspect-ratio: 1000 / 600;
-  height: auto;
-  transform: none !important;
-}
-
-/* PANEL A TODO ANCHO AL ABRIR */
-.map-base.active .menu-panel{
-  left: 0 !important;
-  right: 0 !important;
-  width: 100%;
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 1.2rem;
-  border-radius: 12px;
-}
-
-/* =========================
    MOBILE
+   - Mantengo 4 columnas: se usa scroll horizontal del panel
+   - El mapa abierto ocupa casi toda la pantalla.
 ========================= */
 @media (max-width: 700px){
   body{ background: #141414; }
@@ -477,28 +489,31 @@ body{
     justify-content: center;
   }
 
-  /* en mobile lo hacemos grande pero controlado */
+  /* mapa cerrado */
   .map-base{
-    width: min(96vw, 420px);
+    width: min(94vw, 420px);
     transform: none;
   }
 
-  .menu-panel{
-    top: 4%;
-    bottom: 4%;
-    left: 0;
-    right: 0;
-    border-radius: 0;
-    padding: 0.7rem 0.6rem;
-  }
-
-  /* cuando está abierto en mobile: ocupa el ancho */
+  /* mapa abierto: usa el viewport */
   .map-base.active{
     width: 100vw !important;
+    max-width: 100vw !important;
+    aspect-ratio: 1000 / 600; /* mantiene look de libro */
   }
 
+  /* panel full ancho (centrado igual, pero sin bordes raros) */
   .map-base.active .menu-panel{
-    padding: 0.8rem;
-    border-radius: 0;
+    top: 6%;
+    bottom: 6%;
+    width: 96vw;
+    border-radius: 12px;
+    padding: 0.9rem;
+  }
+
+  /* 4 columnas SIEMPRE: en mobile, scroll horizontal */
+  .menu-panel-inner{
+    min-width: 920px;
+    gap: 12px;
   }
 }
