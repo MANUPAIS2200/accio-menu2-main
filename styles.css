@@ -591,10 +591,15 @@ body{
 @media (max-width: 700px){
 
   /* por defecto, sin scroll horizontal */
-  .map-wrapper{
-    overflow: hidden;
-    -webkit-overflow-scrolling: touch;
-  }
+ .map-wrapper{
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  display: flex;
+  justify-content: center;
+
+  -webkit-overflow-scrolling: touch;
+}
 
   /* cuando el mapa está abierto, el wrapper se vuelve "scroller" */
   .map-wrapper:has(.map-base.active){

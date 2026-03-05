@@ -5,5 +5,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   map.addEventListener("click", () => {
     map.classList.toggle("active");
+    setTimeout(() => {
+  const wrapper = document.querySelector(".map-wrapper");
+  wrapper.scrollLeft = (wrapper.scrollWidth - wrapper.clientWidth) / 2;
+}, 300);
   });
 });
