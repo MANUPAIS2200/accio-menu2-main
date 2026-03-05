@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const isActive = map.classList.contains("active");
     wrapper.classList.toggle("is-open", isActive);
 
-    // centrar el "libro" en mobile al abrir
+    // centrar el "libro" en  al abrir
     if (isActive) {
       window.setTimeout(() => {
         wrapper.scrollLeft = (wrapper.scrollWidth - wrapper.clientWidth) / 2;
