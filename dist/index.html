@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Accio Café - Mapa del Merodeador</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600&family=Satisfy&display=swap" rel="stylesheet" />
+  <script type="module" crossorigin src="/accio-menu2-main/assets/index-DK1cTslS.js"></script>
+  <link rel="stylesheet" crossorigin href="/accio-menu2-main/assets/index-DYnVsFfD.css">
+</head>
+<body>
+  <div class="main-content">
+    <a class="admin-link" href="./admin.html" aria-label="Ir al panel admin">Admin</a>
+    <h1 class="page-title">Accio Café • Inspirado en el Mapa del Merodeador</h1>
+
+    <div class="map-wrapper">
+      <div class="map-base js-map" id="marauders-map">
+        <!-- Huellas y scroll de nombres (puedes personalizar los textos si querés) -->
+        <div class="footsteps footsteps-1">
+          <div class="footstep left"></div>
+          <div class="footstep right"></div>
+          <div class="scroll-name">
+            <p>Accio Café</p>
+          </div>
+        </div>
+
+        <div class="footsteps footsteps-2">
+          <div class="footstep left"></div>
+          <div class="footstep right"></div>
+          <div class="scroll-name">
+            <p>Merodeadores</p>
+          </div>
+        </div>
+
+        <!-- Flaps -->
+        <div class="map-flap flap--1">
+          <div class="map-flap__front"></div>
+          <div class="map-flap__back"></div>
+        </div>
+        <div class="map-flap flap--2">
+          <div class="map-flap__front"></div>
+          <div class="map-flap__back"></div>
+        </div>
+
+        <!-- Lados del mapa -->
+        <div class="map-side side-1">
+          <div class="front" style="--image: url('https://meowlivia.s3.us-east-2.amazonaws.com/codepen/map/8.png')"></div>
+          <div class="back"></div>
+        </div>
+        <div class="map-side side-2">
+          <div class="front" style="--image: url('https://meowlivia.s3.us-east-2.amazonaws.com/codepen/map/18.png')"></div>
+          <div class="back"></div>
+        </div>
+        <div class="map-side side-3">
+          <div class="front" style="--image: url('https://meowlivia.s3.us-east-2.amazonaws.com/codepen/map/7.png')"></div>
+          <div class="back"></div>
+        </div>
+        <div class="map-side side-4">
+          <div class="front" style="--image: url('https://meowlivia.s3.us-east-2.amazonaws.com/codepen/map/10.png')"></div>
+          <div class="back"></div>
+        </div>
+        <div class="map-side side-5">
+          <div class="front" style="--image: url('https://meowlivia.s3.us-east-2.amazonaws.com/codepen/map/6.png')"></div>
+          <div class="back"></div>
+        </div>
+        <div class="map-side side-6">
+          <div class="front" style="--image: url('https://meowlivia.s3.us-east-2.amazonaws.com/codepen/map/11.png')"></div>
+          <div class="back"></div>
+        </div>
+
+        <!-- PANEL DEL MENÚ -->
+        <div class="menu-panel">
+         <div class="menu-panel-inner" id="menuGrid">
+  <div class="muted-loading">Cargando menú...</div>
+</div>
+        </div>
+        <!-- FIN PANEL DEL MENÚ -->
+
+      </div>
+    </div>
+
+    <p class="hint">Tocá el mapa para desplegar el menú mágico ✨</p>
+  </div>
+
+ 
+ <script src="./map.js"></script>
+</body>
+</html>
