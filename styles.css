@@ -465,14 +465,12 @@ body{
   opacity: 1;
   transition: 0.5s opacity 2.5s;
 }
-
-/* =========================
-   MOBILE
-   - Mantengo 4 columnas: se usa scroll horizontal del panel
-   - El mapa abierto ocupa casi toda la pantalla.
-========================= */
+/* =========================================================
+   MOBILE (UN SOLO BLOQUE) – sin :has, sin duplicados
+========================================================= */
 @media (max-width: 700px){
-  body{ background: #141414; }
+  html, body{ overflow-x: hidden; }
+  body{ background:#141414; }
 
   .main-content{
     margin: 0;
@@ -480,63 +478,28 @@ body{
     max-width: 100%;
   }
 
-  .page-title,
-  .hint{ display: none; }
+  .page-title, .hint{ display:none; }
 
+  /* wrapper: cerrado -> sin scroll, centrado */
   .map-wrapper{
     height: 100vh;
+    display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;            /* cerrado: recorta */
+    width: 100vw;
   }
 
-  /* mapa cerrado */
-  .map-base{
-    width: min(94vw, 420px);
-    transform: none;
-  }
+  /* wrapper: abierto -> scroller horizontal (acá se mueve el mapa) */
+  .map-wrapper.is-open{
+    overflow-x: auto;
+    overflow-y: hidden;
+    justify-content: flex-start; /* clave: el scroll manda */
+    -webkit-overflow-scrolling: touch;
 
-  /* mapa abierto: usa el viewport */
-  .map-base.active{
-    width: 100vw !important;
-    max-width: 100vw !important;
-    aspect-ratio: 1000 / 600; /* mantiene look de libro */
-  }
-
-  /* panel full ancho (centrado igual, pero sin bordes raros) */
-  .map-base.active .menu-panel{
-    top: 6%;
-    bottom: 6%;
-    width: 96vw;
-    border-radius: 12px;
-    padding: 0.9rem;
-  }
-
-  /* 4 columnas SIEMPRE: en mobile, scroll horizontal */
-  .menu-panel-inner{
-    min-width: 920px;
-    gap: 12px;
-  }
-}
-
-/* =========================
-   MOBILE: mapa abierto como libro (horizontal)
-   - el mapa se vuelve más ancho que la pantalla
-   - se centra (se ven lados a izquierda y derecha)
-   - el menú queda centrado en el medio
-========================= */
-@media (max-width: 700px){
-
-  /* que no aparezca scroll horizontal de la página */
-  html, body{
-    overflow-x: hidden;
-  }
-
-  /* el wrapper recorta los extremos del mapa */
-  .map-wrapper{
-    height: 100vh;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+    /* un poco de aire para que el centro no quede pegado */
+    padding: 0 10vw;
+    scroll-snap-type: x mandatory;
   }
 
   /* mapa cerrado (vertical) */
@@ -544,19 +507,26 @@ body{
     width: min(92vw, 420px);
     aspect-ratio: 306 / 600;
     height: auto;
-    transform: none;
+    transform: none !important;
+
+    /* para que en modo open el scroll tome el ancho real */
+    flex: 0 0 auto;
   }
 
-  /* mapa abierto: horizontal, “más ancho que el celu” */
+  /* mapa abierto (horizontal, más ancho que la pantalla) */
   .map-base.active{
-    width: 260vw !important;            /* <-- probá 240vw / 260vw / 280vw */
+    width: 260vw !important;     /* ajustable: 240 / 260 / 280 */
     max-width: none !important;
     aspect-ratio: 1000 / 600;
-    height: min(92vh, calc(260vw * 0.6)); /* 0.6 = 600/1000 */
+
+    /* altura proporcional */
+    height: min(92vh, calc(260vw * 0.6));
     transform: none !important;
+
+    scroll-snap-align: center;   /* vuelve al centro fácil */
   }
 
-  /* el panel del menú centrado en el medio del mapa */
+  /* menú centrado en el medio del “mapa abierto” */
   .map-base.active .menu-panel{
     top: 6%;
     bottom: 6%;
@@ -565,62 +535,30 @@ body{
     right: auto !important;
     transform: translateX(-50%);
 
-    width: min(92vw, 720px);           /* tamaño del “papel” central */
+    width: min(92vw, 780px);
     max-width: 92vw;
-
     border-radius: 14px;
     padding: 0.9rem 0.85rem;
+
+    overflow-x: auto;
+    overflow-y: hidden;
   }
 
-  /* mantener 4 columnas (ojo: en celu queda chico, pero cumple tu requisito) */
+  /* 4 columnas SIEMPRE, con scroll horizontal si hace falta */
   .map-base.active .menu-panel-inner{
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.65rem;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(220px, 1fr));
+    gap: 12px;
+
+    min-width: 920px;     /* obliga a que existan 4 columnas */
+    height: 100%;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 12px;
   }
 
-  /* tipografías un toque más chicas para que entren */
+  /* tipografías un toque más chicas en mobile */
   .map-base.active .menu-column h2{ font-size: 0.72rem; }
   .map-base.active .menu-list li{ font-size: 0.66rem; }
   .map-base.active .menu-note{ font-size: 0.66rem; }
-}
-
-/* =========================
-   MOBILE: permitir scroll horizontal del MAPA al abrir
-   (swipe para mover el mapa a izquierda/derecha)
-========================= */
-@media (max-width: 700px){
-
-  /* por defecto, sin scroll horizontal */
- .map-wrapper{
-  overflow-x: auto;
-  overflow-y: hidden;
-
-  display: flex;
-  justify-content: center;
-
-  -webkit-overflow-scrolling: touch;
-}
-
-  /* cuando el mapa está abierto, el wrapper se vuelve "scroller" */
-  .map-wrapper:has(.map-base.active){
-    overflow-x: auto;
-    overflow-y: hidden;
-
-    /* “snap” suave para que vuelva al centro fácil */
-    scroll-snap-type: x mandatory;
-
-    /* un poco de padding para que el centro no quede pegado */
-    padding: 0 6vw;
-  }
-
-  /* el mapa abierto participa del snap */
-  .map-wrapper:has(.map-base.active) .map-base.active{
-    scroll-snap-align: center;
-  }
-
-  /* importante: el body no debe scrollear horizontal,
-     el que scrollea es el wrapper */
-  html, body{
-    overflow-x: hidden;
-  }
 }
