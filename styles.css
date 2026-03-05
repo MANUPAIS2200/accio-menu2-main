@@ -32,6 +32,7 @@ body{
   width: 100%;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
 }
 
 .hint{
@@ -60,7 +61,7 @@ body{
 .admin-link:active{ transform: scale(0.98); }
 
 /* =========================
-   MAPA (CERRADO / RESPONSIVE)
+   MAPA (CERRADO)
 ========================= */
 .map-base{
   width: min(92vw, 360px);
@@ -71,8 +72,6 @@ body{
   display: inline-block;
   transform-origin: top center;
   cursor: pointer;
-
-  /* para que el click no se "pierda" */
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -93,20 +92,14 @@ body{
 .map-base.active::after{ opacity: 1; }
 
 /* =========================
-   ESTADO ABIERTO: mapa se centra y gana ancho (tipo libro)
-   - NO lo hago fixed para no romper tus animaciones originales.
-   - Se expande al ancho del viewport, con un máximo “lindo”.
+   ESTADO ABIERTO DESKTOP (LIBRO)
+   - Acá usamos el look 1000/600 para que “sea libro”
 ========================= */
 .map-base.active{
   width: min(100vw, 1200px) !important;
-  aspect-ratio: 1000 / 600;   /* mantiene la proporción de “mapa abierto” */
+  aspect-ratio: 1000 / 600;
   height: auto;
   transform: none !important;
-}
-
-/* cuando está abierto, el wrapper lo centra */
-.map-wrapper{
-  align-items: flex-start;
 }
 
 /* =========================
@@ -123,7 +116,7 @@ body{
   border: 1px solid rgba(80, 52, 26, 0.4);
   box-shadow: 0 6px 16px rgba(0,0,0,0.4);
   padding: 0.8rem 1rem;
-  overflow: hidden; /* el scroll lo maneja el inner */
+  overflow: hidden; /* scroll lo maneja inner */
   color: #3b2414;
   backdrop-filter: blur(2px);
 
@@ -137,41 +130,32 @@ body{
 .map-base.active .menu-panel{
   opacity: 1;
   pointer-events: auto;
-  transform: scale(1);
-
-  /* menú centrado como “hoja” */
   left: 50% !important;
   right: auto !important;
-  transform: translateX(-50%) scale(1);
   width: min(100%, 1000px);
   max-width: 1000px;
   padding: 1.1rem 1.1rem;
+  transform: translateX(-50%) scale(1);
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
-/* Scroll suave mobile */
+/* GRID: 4 columnas SIEMPRE (y scroll horizontal si no entra) */
 .menu-panel-inner{
   height: 100%;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
 
-  /* 👇 4 columnas SIEMPRE */
   display: grid;
   grid-template-columns: repeat(4, minmax(220px, 1fr));
   gap: 1.1rem;
 
-  /* Si la pantalla es chica, aparece scroll horizontal para mantener 4 col */
-  min-width: 920px;              /* 4 * 220 + gaps (aprox) */
+  min-width: 920px;
   padding-bottom: 12px;
 }
 
-/* Para que el panel permita scroll horizontal cuando haga falta */
-.map-base.active .menu-panel{
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-
 /* =========================
-   ESTILO DEL MENÚ (SECCIONES/ITEMS)
+   ESTILO DEL MENÚ
 ========================= */
 .muted-loading{
   color: #3b2414;
@@ -250,8 +234,7 @@ body{
 }
 
 /* =========================
-   ELEMENTOS DEL MAPA (FLAPS, LADOS, HUELLAS)
-   Adaptados a tamaños fluidos
+   ELEMENTOS DEL MAPA (DESKTOP)
 ========================= */
 .map-flap{
   transform-style: preserve-3d;
@@ -391,15 +374,13 @@ body{
 .footsteps-2 .scroll-name{ bottom: 300px; left: 220px; }
 
 /* =========================
-   MAPA ABIERTO (ANIMACIONES)
-   => esto es lo que hace “abrir como libro”
+   ANIMACIONES (DESKTOP) – abrir como libro
 ========================= */
 .map-base.active .flap--1{
   transform: rotateX(180deg);
   transform-origin: top center;
   transition: 0.6s transform 1.5s;
 }
-
 .map-base.active .flap--2{
   transform: rotateX(180deg);
   transform-origin: bottom center;
@@ -465,8 +446,12 @@ body{
   opacity: 1;
   transition: 0.5s opacity 2.5s;
 }
+
 /* =========================================================
-   MOBILE (UN SOLO BLOQUE) – sin :has, sin duplicados
+   MOBILE: SCROLL REAL DEL MAPA ABIERTO (300vw)
+   - IMPORTANTE: el scroll horizontal lo hace .map-wrapper.is-open
+   - IMPORTANTÍSIMO: acá dejamos de depender de left:-100% / 150%
+     porque eso NO suma al scrollWidth.
 ========================================================= */
 @media (max-width: 700px){
   html, body{ overflow-x: hidden; }
@@ -480,85 +465,103 @@ body{
 
   .page-title, .hint{ display:none; }
 
-  /* wrapper: cerrado -> sin scroll, centrado */
+  /* wrapper cerrado */
   .map-wrapper{
     height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;            /* cerrado: recorta */
     width: 100vw;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
   }
 
-  /* wrapper: abierto -> scroller horizontal (acá se mueve el mapa) */
+  /* wrapper abierto: scroller */
   .map-wrapper.is-open{
     overflow-x: auto;
     overflow-y: hidden;
-    justify-content: flex-start; /* clave: el scroll manda */
+    justify-content: flex-start;
     -webkit-overflow-scrolling: touch;
-
-    /* un poco de aire para que el centro no quede pegado */
-    padding: 0 10vw;
-    scroll-snap-type: x mandatory;
+    padding: 0 8vw;
   }
 
-  /* mapa cerrado (vertical) */
+  /* mapa cerrado */
   .map-base{
     width: min(92vw, 420px);
     aspect-ratio: 306 / 600;
     height: auto;
-    transform: none !important;
-
-    /* para que en modo open el scroll tome el ancho real */
     flex: 0 0 auto;
-  }
-
-  /* mapa abierto (horizontal, más ancho que la pantalla) */
-  .map-base.active{
-    width: 260vw !important;     /* ajustable: 240 / 260 / 280 */
-    max-width: none !important;
-    aspect-ratio: 1000 / 600;
-
-    /* altura proporcional */
-    height: min(92vh, calc(260vw * 0.6));
     transform: none !important;
-
-    scroll-snap-align: center;   /* vuelve al centro fácil */
   }
 
-  /* menú centrado en el medio del “mapa abierto” */
+  /* mapa abierto: ancho real dentro del DOM */
+  .map-base.active{
+    width: 300vw !important;     /* 6 paneles de 50vw */
+    max-width: none !important;
+    height: min(92vh, calc(50vw * 0.6)); /* 600/1000 */
+    background: transparent !important;  /* tapa afuera */
+    aspect-ratio: auto;
+    transform: none !important;
+    position: relative;
+  }
+
+  /* opcional: sacamos flaps en mobile para evitar solapa rara */
+  .map-base.active .map-flap{ display:none; }
+
+  /* Reposicionamos los paneles DENTRO del ancho (para que scrollee bien) */
+  .map-base.active .map-side{
+    position: absolute !important;
+    top: 0 !important;
+    height: 100% !important;
+    width: 50vw !important;
+    transition: none !important;
+  }
+
+  /* Orden “libro” dentro de 300vw */
+  .map-base.active .side-5{ left: 0vw !important; }
+  .map-base.active .side-3{ left: 50vw !important; }
+  .map-base.active .side-1{ left: 100vw !important; }
+  .map-base.active .side-2{ left: 150vw !important; }
+  .map-base.active .side-4{ left: 200vw !important; }
+  .map-base.active .side-6{ left: 250vw !important; }
+
+  /* menú centrado en el medio del libro */
   .map-base.active .menu-panel{
-    top: 6%;
-    bottom: 6%;
+    top: 10% !important;
+    bottom: 10% !important;
 
-    left: 50% !important;
+    left: 150vw !important;      /* centro del libro */
     right: auto !important;
-    transform: translateX(-50%);
+    transform: translateX(-50%) !important;
 
-    width: min(92vw, 780px);
-    max-width: 92vw;
-    border-radius: 14px;
+    width: min(92vw, 780px) !important;
+    max-width: 92vw !important;
     padding: 0.9rem 0.85rem;
+
+    opacity: 1 !important;
+    pointer-events: auto !important;
 
     overflow-x: auto;
     overflow-y: hidden;
   }
 
-  /* 4 columnas SIEMPRE, con scroll horizontal si hace falta */
+  /* 4 columnas siempre (con scroll horizontal si hace falta) */
   .map-base.active .menu-panel-inner{
     display: grid;
     grid-template-columns: repeat(4, minmax(220px, 1fr));
     gap: 12px;
 
-    min-width: 920px;     /* obliga a que existan 4 columnas */
+    min-width: 920px;
     height: 100%;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 12px;
   }
 
-  /* tipografías un toque más chicas en mobile */
+  /* tipografías más chicas en mobile */
   .map-base.active .menu-column h2{ font-size: 0.72rem; }
   .map-base.active .menu-list li{ font-size: 0.66rem; }
   .map-base.active .menu-note{ font-size: 0.66rem; }
+
+  /* en mobile no mostramos huellas/scroll-name (pueden quedar mal posicionados) */
+  .scroll-name, .footstep{ display:none; }
 }
