@@ -5,7 +5,7 @@ import {
   query,
   orderBy
 } from "firebase/firestore";
-
+import "./map.js";
 document.addEventListener("DOMContentLoaded", () => {
   const mapBase = document.querySelector(".js-map");
   if (mapBase) {
